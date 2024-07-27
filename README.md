@@ -1,2 +1,2 @@
 suite ici
-https://github.com/MauryTiteux/raspberry-sensors-web
+https://github.com/MauryTiteux/raspberry-sensors
