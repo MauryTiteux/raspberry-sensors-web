@@ -7,9 +7,21 @@ try {
     die($e);
 }
 
-$query = $pdo->query('SELECT * FROM logs');
-$logs = $query->fetchAll();
+// Récupération du nombre max de logs 
+$limit = $_GET['limit'] ?? 50;
+// Afficher ou non uniquement les erreurs
+$only_errors = $_GET['only_errors'] ? $_GET['only_errors'] === '0' ? false :  true : false;
 
+if ($only_errors) {
+    // Filtre sur les logs qui ont metadata de définie
+    $query = $pdo->prepare('SELECT * FROM (SELECT * FROM logs WHERE metadata IS NOT NULL ORDER BY created_at DESC LIMIT ?) subquery ORDER BY created_at ASC');
+} else {
+    $query = $pdo->prepare('SELECT * FROM (SELECT * FROM logs ORDER BY created_at DESC LIMIT ?) subquery ORDER BY created_at ASC');
+}
+
+$query->bindParam(1, $limit, PDO::PARAM_INT);
+$query->execute();
+$logs = $query->fetchAll();
 ?>
 
 <style>
@@ -18,7 +30,18 @@ $logs = $query->fetchAll();
     }
 </style>
 
-<a href="/sensors/settings.php">Paramètres</a>
+<table border="1">
+    <tr>
+        <td>
+            <a href="/sensors/settings.php">Paramètres</a>
+        </td>
+        <td>
+            <a href="/sensors?<?= http_build_query(['limit' => $limit, 'only_errors' => $only_errors ? '0' : '1']) ?>">
+                <?= $only_errors ? 'Afficher tout' : 'Afficher seulement les erreurs' ?>
+            </a>
+        </td>
+    </tr>
+</table>
 
 <table border="1" style="text-align:center;">
     <thead>
@@ -51,6 +74,11 @@ $logs = $query->fetchAll();
     </tbody>
 <table>
 
-<script>
-    setInterval(() => location.reload(), 1000)
-</script>
+<table border="1">
+    <tr>
+        <td>
+            <a href="/sensors?<?= http_build_query(['limit' => $limit + 50, 'only_errors' => $only_errors ? '1' : '0']) ?>">Charger plus</a>
+        </td>
+    </tr>
+</table>
+

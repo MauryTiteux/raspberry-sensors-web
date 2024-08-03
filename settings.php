@@ -97,15 +97,6 @@ if (!empty($_POST)) {
       };
   }
 }
-
-$timestamp_date_cible = strtotime($settings['resume_at']);
-$timestamp_actuel = time();
-
-$temps_restant = $timestamp_date_cible - $timestamp_actuel;
-
-$heures = floor($temps_restant / 3600);
-$minutes = floor(($temps_restant % 3600) / 60);
-$secondes = $temps_restant % 60;
 ?>
 
 <style>
@@ -167,35 +158,41 @@ $secondes = $temps_restant % 60;
   }
 </style>
 
-<a href="/sensors/">Logs</a>
+<table border="1px">
+  <tr>
+    <td>
+      <a href="/sensors/">Logs</a>
+    </td>
+  </tr>
+</table>
 
 <form method="POST">
   <fieldset>
     <h2>Heures ouvertures/fermetures</h2>
     <label>
-      <span>Ouverture en été</span>
+      <span>Début de journée en été</span>
       <input name="summer_opening_hour" type="number" value="<?= $settings['summer_opening_hour']  ?>" required min="0" max="24">
       <span class="error"><?= $errors['summer_opening_hour'] ?></span>
     </label>
     <label>
-      <span>Fermeture en été</span>
+      <span>Tombée de la nuit en été</span>
       <input name="summer_closing_hour" type="number" value="<?= $settings['summer_closing_hour']  ?>" required min="0" max="24">
       <span class="error"><?= $errors['summer_closing_hour'] ?></span>
     </label>
     <label>
-      <span>Ouverture en hiver</span>
+      <span>Début de journée en hiver</span>
       <input name="winter_opening_hour" type="number" value="<?= $settings['winter_opening_hour']  ?>" required min="0" max="24">
       <span class="error"><?= $errors['winter_opening_hour'] ?></span>
     </label>
     <label>
-      <span>Fermeture en hiver</span>
+      <span>Tombée de la nuit en hiver</span>
       <input name="winter_closing_hour" type="number" value="<?= $settings['winter_closing_hour']  ?>" required min="0" max="24">
       <span class="error"><?= $errors['winter_closing_hour'] ?></span>
     </label>
   </fieldset>
 
   <fieldset>
-    <h2>Température</h2>
+    <h2>Température (C°)</h2>
     <label>
       <span>Minimale</span>
       <input name="temperature_min" type="number" value="<?= $settings['temperature_min']  ?>" required min="-50" max="50">
@@ -209,7 +206,7 @@ $secondes = $temps_restant % 60;
   </fieldset>
 
   <fieldset>
-    <h2>Humidité</h2>
+    <h2>Humidité (en %)</h2>
     <label>
       <span>Minimale</span>
       <input name="humidity_min" type="number" value="<?= $settings['humidity_min'] ?>" required min="0" max="100">
@@ -245,13 +242,19 @@ $secondes = $temps_restant % 60;
       </label>
       <span class="error"><?= $errors['custom_solar_blind_status'] ?></span>
     </div>
-    <div>
+    <div style="display: <?= $settings['custom_solar_blind_status'] ? 'block' : 'none' ?>" data-resume-at>
       <label>
         <span>Heure de reprise du mode automatique</span>
         <input type="datetime-local" name="resume_at" value="<?= $settings['resume_at'] ?>">
-        <?= $settings['resume_at'] ? "Temps restant : $heures heures, $minutes minutes, $secondes secondes." : '' ?>
+        <?= $settings['resume_at'] ? "<span data-resume-at-timer></span>" : '' ?>
         <span class="error"><?= $errors['resume_at'] ?></span>
       </label>
+      <div style="display: flex; gap: 0.5rem;" data-presets>
+        <button type="button" data-preset="2">2h</button>
+        <button type="button" data-preset="10">10h</button>
+        <button type="button" data-preset="24">24h</button>
+        <!-- <button type="button" data-preset="168">Une semaine</button> -->
+      </div>
       <?= $settings['resume_at'] ? '<button name="action" value="automatic">Supprimer le décompte</button>' : '' ?>
     </div>
   </fieldset>
@@ -261,3 +264,66 @@ $secondes = $temps_restant % 60;
     <button name="action" value="save">Sauvegarder</button>
   </div>
 <form>
+
+<script>
+  // Format date JS vers date input html
+  const convertToDateTimeLocalString = (date) => {
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    const day = date.getDate().toString().padStart(2, "0");
+    const hours = date.getHours().toString().padStart(2, "0");
+    const minutes = date.getMinutes().toString().padStart(2, "0");
+
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  }
+
+  const resumeAtBlock = document.querySelector('[data-resume-at]');
+  const resumeAtField = document.querySelector('[name="resume_at"]');
+  
+  // Gestion des boutons 2h/10h/24h
+  document.querySelector('[data-presets]').addEventListener('click', ({ target }) => {
+    const hour = Number(target.dataset.preset);
+    if (!hour) return; 
+    
+    const date = new Date();
+    date.setHours(date.getHours() + hour);
+    
+    resumeAtField.value = convertToDateTimeLocalString(date);
+  });
+  
+  // Quand les valeurs du formulaire changent, on regarde si le statut ON / OFF.
+  // On affiche ou masque le champ date en fonction
+  document.querySelector('form').addEventListener('change', () => {
+    // Check si un des deux est cochés
+    if (document.querySelector('input[name=custom_solar_blind_status]:checked')) {
+      resumeAtBlock.style.display = 'block';
+      return;
+    }
+    
+    resumeAtBlock.style.display = 'none';
+  });
+  
+  // Récupération de la span pour insérez le décompte
+  const resumeAtTimer = document.querySelector('[data-resume-at-timer]');
+  const resumeAtTimerDate = new Date(resumeAtField.value);
+
+  // Décompte 1s
+  const timerInterval = setInterval(() => {
+    if (!resumeAtTimer) return;
+
+    const now = new Date();
+    const timeDifference = resumeAtTimerDate - now;
+
+    // Quand le timer est terminé on coupe l'interval
+    if (timeDifference <= 0) {
+        clearInterval(timerInterval);
+        return;
+    }
+
+    const hours = Math.floor((timeDifference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((timeDifference % (1000 * 60)) / 1000);
+
+    resumeAtTimer.textContent = `Temps restant : ${hours} heures, ${minutes} minutes, ${seconds} secondes.`
+  }, 1000)
+</script>
