@@ -14,9 +14,9 @@ $only_errors = $_GET['only_errors'] ? $_GET['only_errors'] === '0' ? false :  tr
 
 if ($only_errors) {
     // Filtre sur les logs qui ont metadata de définie
-    $query = $pdo->prepare('SELECT * FROM (SELECT * FROM logs WHERE metadata IS NOT NULL ORDER BY created_at DESC LIMIT ?) subquery ORDER BY created_at ASC');
+    $query = $pdo->prepare('SELECT * FROM (SELECT * FROM logs WHERE metadata IS NOT NULL ORDER BY id DESC LIMIT ?) subquery ORDER BY created_at ASC');
 } else {
-    $query = $pdo->prepare('SELECT * FROM (SELECT * FROM logs ORDER BY created_at DESC LIMIT ?) subquery ORDER BY created_at ASC');
+    $query = $pdo->prepare('SELECT * FROM (SELECT * FROM logs ORDER BY id DESC LIMIT ?) subquery ORDER BY id ASC');
 }
 
 $query->bindParam(1, $limit, PDO::PARAM_INT);
@@ -39,6 +39,9 @@ $logs = $query->fetchAll();
             <a href="/sensors?<?= http_build_query(['limit' => $limit, 'only_errors' => $only_errors ? '0' : '1']) ?>">
                 <?= $only_errors ? 'Afficher tout' : 'Afficher seulement les erreurs' ?>
             </a>
+        </td>
+        <td>
+            <a href=<?= $_SERVER['REQUEST_URI'] ?>>Rafraichir</a>
         </td>
     </tr>
 </table>
