@@ -24,64 +24,80 @@ $query->execute();
 $logs = $query->fetchAll();
 ?>
 
-<style>
-    td, th {
-        padding: 8 32;
-    }
-</style>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
 
-<table border="1">
-    <tr>
-        <td>
-            <a href="/sensors/settings.php">Paramètres</a>
-        </td>
-        <td>
-            <a href="/sensors?<?= http_build_query(['limit' => $limit, 'only_errors' => $only_errors ? '0' : '1']) ?>">
-                <?= $only_errors ? 'Afficher tout' : 'Afficher seulement les erreurs' ?>
-            </a>
-        </td>
-        <td>
-            <a href=<?= $_SERVER['REQUEST_URI'] ?>>Rafraichir</a>
-        </td>
-    </tr>
-</table>
-
-<table border="1" style="text-align:center;">
-    <thead>
+<body>
+    <style>
+        td, th {
+            padding: 8 32;
+        }
+    </style>
+    
+    <table border="1">
         <tr>
-            <th>ID</th>
-            <th>Température</th>
-            <th>Humidité</th>
-            <th>LUX</th>
-            <th>Statut du store</th>
-            <th>Statut du script</th>
-            <th>Message de l'écran LCD</th>
-            <th>Message</th>
-            <th>Date de création</th>
+            <td>
+                <a href="/sensors/settings.php">Paramètres</a>
+            </td>
+            <td>
+                <a href="/sensors/agenda.php">Agenda</a>
+            </td>
+            <td>
+                <a href="/sensors/recurrent.php">Récurrence</a>
+            </td>
+            <td>
+                <a href="/sensors">Logs</a>
+            </td>
+            <td>
+                <a href="/sensors?<?= http_build_query(['limit' => $limit, 'only_errors' => $only_errors ? '0' : '1']) ?>">
+                    <?= $only_errors ? 'Afficher tout' : 'Afficher seulement les erreurs' ?>
+                </a>
+            </td>
+            <td>
+                <a href=<?= $_SERVER['REQUEST_URI'] ?>>Rafraichir</a>
+            </td>
         </tr>
-    </thead>
-    <tbody>
-        <?php foreach(array_reverse($logs) as $log): ?>
+    </table>
+    
+    <table border="1" style="text-align:center;">
+        <thead>
             <tr>
-                <td><?= $log['id'] ?></td>
-                <td><?= $log['temperature'] ?></td>
-                <td><?= $log['humidity'] ?></td>
-                <td><?= $log['lux'] ?></td>
-                <td><?= $log['solar_blind_status'] ? $log['solar_blind_status'] : '-' ?></td>
-                <td><?= $log['script_status'] ?></td>
-                <td><?= $log['message'] ?></td>
-                <td><?= $log['metadata'] ? $log['metadata'] : '-' ?></td>
-                <td><?= $log['created_at'] ?></td>
+                <th>ID</th>
+                <th>Température</th>
+                <th>Humidité</th>
+                <th>LUX</th>
+                <th>Statut du store</th>
+                <th>Statut du script</th>
+                <th>Message de l'écran LCD</th>
+                <th>Message</th>
+                <th>Date de création</th>
             </tr>
-        <?php endforeach ?>
-    </tbody>
-<table>
+        </thead>
+        <tbody>
+            <?php foreach(array_reverse($logs) as $log): ?>
+                <tr>
+                    <td><?= $log['id'] ?></td>
+                    <td><?= $log['temperature'] ?></td>
+                    <td><?= $log['humidity'] ?></td>
+                    <td><?= $log['lux'] ?></td>
+                    <td><?= $log['solar_blind_status'] ? $log['solar_blind_status'] : '-' ?></td>
+                    <td><?= $log['script_status'] ?></td>
+                    <td><?= $log['message'] ?></td>
+                    <td><?= $log['metadata'] ? $log['metadata'] : '-' ?></td>
+                    <td><?= $log['created_at'] ?></td>
+                </tr>
+            <?php endforeach ?>
+        </tbody>
+    <table>
+    
+    <table border="1">
+        <tr>
+            <td>
+                <a href="/sensors?<?= http_build_query(['limit' => $limit + 50, 'only_errors' => $only_errors ? '1' : '0']) ?>">Charger plus</a>
+            </td>
+        </tr>
+    </table>
 
-<table border="1">
-    <tr>
-        <td>
-            <a href="/sensors?<?= http_build_query(['limit' => $limit + 50, 'only_errors' => $only_errors ? '1' : '0']) ?>">Charger plus</a>
-        </td>
-    </tr>
-</table>
+</body>    
 

@@ -99,6 +99,11 @@ if (!empty($_POST)) {
 }
 ?>
 
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body>
 <style>
   body {
     font-family: sans-serif;
@@ -158,12 +163,21 @@ if (!empty($_POST)) {
   }
 </style>
 
-<table border="1px">
-  <tr>
-    <td>
-      <a href="/sensors/">Logs</a>
-    </td>
-  </tr>
+<table border="1">
+    <tr>
+        <td>
+        <a href="/sensors/settings.php">Paramètres</a>
+        </td>
+        <td>
+            <a href="/sensors/agenda.php">Agenda</a>
+        </td>
+        <td>
+          <a href="/sensors/recurrent.php">Récurrence</a>
+        </td>
+        <td>
+            <a href="/sensors">Logs</a>
+        </td>
+    </tr>
 </table>
 
 <form method="POST">
@@ -327,3 +341,4 @@ if (!empty($_POST)) {
     resumeAtTimer.textContent = `Temps restant : ${hours} heures, ${minutes} minutes, ${seconds} secondes.`
   }, 1000)
 </script>
+</body>
