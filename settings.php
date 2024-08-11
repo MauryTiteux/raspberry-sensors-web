@@ -99,84 +99,11 @@ if (!empty($_POST)) {
 }
 ?>
 
-<head>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
-
-<body>
-<style>
-  body {
-    font-family: sans-serif;
-    max-width: 800px;
-    margin: 2rem auto;
-  }
-
-  form {
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
-  }
-
-  fieldset {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    padding: 2rem;
-    gap: 1rem;
-  }
-
-  h2 {
-    grid-column: span 2;
-    line-height: 1;
-    margin: 0 0 1rem 0;
-  }
-
-  label {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    line-height: 1;
-  }
-
-  .radio {
-    display: grid;
-    grid-template-colums: repeat(2, 1fr);
-  }
-
-  .radio > span {
-    grid-column: span 2;
-  }
-
-  .radio label {
-    flex-direction: row;
-    align-items: center;
-  }
-
-  .error {
-    color: red;
-    font-size: 12px;
-  }
-  
-  .buttons {
-    margin-left: auto;
-    display: flex;
-    gap: 1rem;
-  }
-</style>
+<?php include './head.php' ?>
 
 <table border="1">
     <tr>
-        <td>
-        <a href="/sensors/settings.php">Paramètres</a>
-        </td>
-        <td>
-            <a href="/sensors/agenda.php">Agenda</a>
-        </td>
-        <td>
-          <a href="/sensors/recurrent.php">Récurrence</a>
-        </td>
-        <td>
-            <a href="/sensors">Logs</a>
-        </td>
+      <?php include './menu.php' ?>
     </tr>
 </table>
 
@@ -269,7 +196,7 @@ if (!empty($_POST)) {
         <button type="button" data-preset="24">24h</button>
         <!-- <button type="button" data-preset="168">Une semaine</button> -->
       </div>
-      <?= $settings['resume_at'] ? '<button name="action" value="automatic">Supprimer le décompte</button>' : '' ?>
+      <?= $settings['resume_at'] ? '<button class="error-button" style="margin-top:0.5rem;" name="action" value="automatic">Supprimer le décompte</button>' : '' ?>
     </div>
   </fieldset>
 

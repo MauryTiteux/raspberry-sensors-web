@@ -24,32 +24,12 @@ $query->execute();
 $logs = $query->fetchAll();
 ?>
 
-<head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
-
-<body>
-    <style>
-        td, th {
-            padding: 8 32;
-        }
-    </style>
+<?php include './head.php' ?>
     
-    <table border="1">
-        <tr>
-            <td>
-                <a href="/sensors/settings.php">Paramètres</a>
-            </td>
-            <td>
-                <a href="/sensors/agenda.php">Agenda</a>
-            </td>
-            <td>
-                <a href="/sensors/recurrent.php">Récurrence</a>
-            </td>
-            <td>
-                <a href="/sensors">Logs</a>
-            </td>
-            <td>
+    <table>
+        <tr class="tr">
+            <?php include './menu.php' ?>
+            <td class="td" width="240px">
                 <a href="/sensors?<?= http_build_query(['limit' => $limit, 'only_errors' => $only_errors ? '0' : '1']) ?>">
                     <?= $only_errors ? 'Afficher tout' : 'Afficher seulement les erreurs' ?>
                 </a>
@@ -58,7 +38,7 @@ $logs = $query->fetchAll();
                 <a href=<?= $_SERVER['REQUEST_URI'] ?>>Rafraichir</a>
             </td>
         </tr>
-    </table>
+    </div>
     
     <table border="1" style="text-align:center;">
         <thead>
