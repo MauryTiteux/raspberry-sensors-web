@@ -87,8 +87,8 @@ if (!empty($_POST['delete'])) {
       </thead>
       <?php foreach($events as $event): ?>
         <tr>
-          <td><?= date_format(date_create($event['start_at']),"d/m/Y") ?></td>
-          <td><?= date_format(date_create($event['end_at']),"d/m/Y") ?></td>
+          <td><?= date_format(date_create($event['start_at']),"d/m/Y H:i") ?></td>
+          <td><?= date_format(date_create($event['end_at']),"d/m/Y H:i") ?></td>
           <td>
             <form method="POST">
                 <button class="error-button" type="submit" name="delete" value="<?= $event['id'] ?>">Supprimer</button>

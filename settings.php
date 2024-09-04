@@ -258,6 +258,8 @@ if (!empty($_POST)) {
     // Quand le timer est terminé on coupe l'interval
     if (timeDifference <= 0) {
         clearInterval(timerInterval);
+        document.querySelector('input[name="custom_solar_blind_status"]:checked').checked = false;
+        resumeAtBlock.style.display = 'none';
         return;
     }
 
