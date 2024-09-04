@@ -11,10 +11,12 @@ try {
 $limit = $_GET['limit'] ?? 50;
 // Afficher ou non uniquement les erreurs
 $only_errors = $_GET['only_errors'] ? $_GET['only_errors'] === '0' ? false :  true : false;
+$hide_errors = $_GET['hide_errors'] ? $_GET['hide_errors'] === '0' ? false :  true : false;
 
 if ($only_errors) {
-    // Filtre sur les logs qui ont metadata de définie
-    $query = $pdo->prepare('SELECT * FROM (SELECT * FROM logs WHERE metadata IS NOT NULL ORDER BY id DESC LIMIT ?) subquery ORDER BY created_at ASC');
+    $query = $pdo->prepare('SELECT * FROM (SELECT * FROM logs WHERE metadata LIKE "%❌%" ORDER BY id DESC LIMIT ?) subquery ORDER BY created_at ASC');
+} elseif ($hide_errors) {
+    $query = $pdo->prepare('SELECT * FROM (SELECT * FROM logs WHERE (metadata NOT LIKE "%❌%" OR metadata IS NULL) ORDER BY id DESC LIMIT ?) subquery ORDER BY created_at ASC');
 } else {
     $query = $pdo->prepare('SELECT * FROM (SELECT * FROM logs ORDER BY id DESC LIMIT ?) subquery ORDER BY id ASC');
 }
@@ -32,6 +34,11 @@ $logs = $query->fetchAll();
             <td class="td" width="240px">
                 <a href="/sensors?<?= http_build_query(['limit' => $limit, 'only_errors' => $only_errors ? '0' : '1']) ?>">
                     <?= $only_errors ? 'Afficher tout' : 'Afficher seulement les erreurs' ?>
+                </a>
+            </td>
+            <td class="td" width="240px">
+                <a href="/sensors?<?= http_build_query(['limit' => $limit, 'hide_errors' => $hide_errors ? '0' : '1']) ?>">
+                    <?= $hide_errors ? 'Afficher tout' : 'Masque les erreurs' ?>
                 </a>
             </td>
             <td>
@@ -63,7 +70,7 @@ $logs = $query->fetchAll();
                     <td><?= $log['lux'] ?></td>
                     <td><?= $log['solar_blind_status'] ? $log['solar_blind_status'] : '-' ?></td>
                     <td><?= $log['script_status'] ?></td>
-                    <td><?= $log['message'] ?></td>
+                    <td width="125"><?= $log['message'] ?></td>
                     <td><?= $log['metadata'] ? $log['metadata'] : '-' ?></td>
                     <td><?= $log['created_at'] ?></td>
                 </tr>
@@ -74,7 +81,7 @@ $logs = $query->fetchAll();
     <table border="1">
         <tr>
             <td>
-                <a href="/sensors?<?= http_build_query(['limit' => $limit + 50, 'only_errors' => $only_errors ? '1' : '0']) ?>">Charger plus</a>
+                <a href="/sensors?<?= http_build_query(['limit' => $limit + 50, 'only_errors' => $only_errors ? '1' : '0', 'hide_errors' => $hide_errors ? '1' : '0']) ?>">Charger plus</a>
             </td>
         </tr>
     </table>
